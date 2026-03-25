@@ -766,7 +766,7 @@
 
     /* Seção About */
     .about-strip { grid-template-columns: 1fr; gap: 40px; padding: 64px 6vw; }
-    .about-image { max-height: 380px; }
+    .about-image { aspect-ratio: 4/3; width: 100%; }
 
     /* Features */
     .features { grid-template-columns: repeat(2, 1fr); }
@@ -824,7 +824,7 @@
     .section-header { padding: 44px 20px 20px; }
     .section-title { font-size: 28px; }
     .product-name { font-size: 15px; }
-    .product-info { padding: 12px 0 4px; }
+    .product-info { padding: 12px 12px 8px; }
     .btn-quick { font-size: 9px; padding: 8px 6px; }
 
     /* Editorial */
@@ -849,10 +849,14 @@
     .newsletter-input { font-size: 16px; }
 
     /* Footer */
-    .footer-grid { grid-template-columns: 1fr; gap: 32px; margin-bottom: 40px; }
-    footer { padding: 48px 20px 32px; padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
-    .footer-brand p { max-width: 100%; }
-    .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+    /* Rodapé compacto: brand em cima, 3 colunas de link em grid 2 colunas */
+    footer { padding: 36px 20px 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 20px 28px; margin-bottom: 24px; }
+    .footer-brand { grid-column: 1 / -1; margin-bottom: 0; }
+    .footer-brand p { max-width: 100%; font-size: 12px; margin-top: 8px; line-height: 1.6; }
+    .footer-col h4 { margin-bottom: 12px; }
+    .footer-col a { font-size: 12px; margin-bottom: 7px; }
+    .footer-bottom { flex-direction: column; gap: 6px; text-align: center; padding-top: 16px; font-size: 10px; }
 
     /* Modal */
     .modal-overlay { padding: 0; align-items: flex-end; }
