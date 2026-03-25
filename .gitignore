@@ -1,0 +1,31 @@
+# Variáveis de ambiente — NUNCA subir para o repositório
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Vercel
+.vercel
+
+# Node.js (caso instale dependências futuramente)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores de código
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/

@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Aura Pijamas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
+<style>
+  :root {
+    --cream: #F7F3EE;
+    --sand: #E8DDD0;
+    --stone: #C4B5A5;
+    --earth: #8B7355;
+    --bark: #4A3728;
+    --dark: #1C1410;
+    --white: #FDFAF7;
+    --accent: #B8956A;
+    --success: #4A7A5A;
+    --danger: #9B4A4A;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Jost', sans-serif;
+    --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--cream); color: var(--dark); font-family: var(--font-sans); font-weight: 300; min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--sand);
+    padding: 0 6vw;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo { font-family: var(--font-serif); font-size: 22px; color: var(--dark); text-decoration: none; }
+  .logo em { font-style: italic; color: var(--earth); }
+  .back-link { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stone); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color var(--transition); }
+  .back-link:hover { color: var(--dark); }
+  .secure-badge { font-size: 11px; color: var(--stone); display: flex; align-items: center; gap: 6px; letter-spacing: 0.05em; }
+
+  /* LAYOUT */
+  .checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 6vw 80px;
+    align-items: start;
+  }
+
+  /* FORM SIDE */
+  .form-side { padding-right: 60px; }
+
+  .step-title {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--sand);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .step-num {
+    width: 28px; height: 28px;
+    border: 1px solid var(--stone);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    color: var(--stone);
+    font-family: var(--font-sans);
+    flex-shrink: 0;
+  }
+
+  .form-section { margin-bottom: 36px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-row.triple { grid-template-columns: 2fr 1fr 1fr; }
+  .form-row.single { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone); }
+  input, select {
+    background: var(--white);
+    border: 1px solid var(--sand);
+    color: var(--dark);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 300;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color var(--transition);
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--earth); }
+  input::placeholder { color: var(--stone); opacity: 0.6; }
+  input.error { border-color: var(--danger); }
+  .field-error { font-size: 11px; color: var(--danger); margin-top: 4px; display: none; }
+  .field-error.show { display: block; }
+
+  /* PAYMENT TABS */
+  .payment-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--sand);
+    border: 1px solid var(--sand);
+    margin-bottom: 28px;
+  }
+  .payment-tab {
+    background: var(--white);
+    border: none;
+    padding: 16px 12px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stone);
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .payment-tab:hover { background: var(--cream); color: var(--dark); }
+  .payment-tab.active { background: var(--bark); color: var(--cream); }
+  .tab-icon { font-size: 18px; }
+
+  /* CARD FIELDS */
+  .card-fields, .pix-fields, .boleto-fields { display: none; }
+  .card-fields.active, .pix-fields.active, .boleto-fields.active { display: block; }
+
+  .card-number-wrap { position: relative; }
+  .card-brand {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 11px; color: var(--stone); letter-spacing: 0.05em;
+    transition: opacity var(--transition);
+  }
+
+  .installments-info { font-size: 12px; color: var(--stone); margin-top: 8px; line-height: 1.5; }
+  .installments-info span { color: var(--earth); }
+
+  /* PIX BLOCK */
+  .pix-block {
+    background: var(--white);
+    border: 1px solid var(--sand);
+    padding: 28px;
+    text-align: center;
+  }
+  .pix-icon { font-size: 40px; margin-bottom: 16px; color: var(--earth); }
+  .pix-title { font-family: var(--font-serif); font-size: 22px; margin-bottom: 8px; }
+  .pix-desc { font-size: 13px; color: var(--stone); line-height: 1.7; max-width: 320px; margin: 0 auto 20px; }
+  .pix-benefit { display: inline-flex; align-items: center; gap: 8px; background: rgba(74,122,90,0.08); color: var(--success); font-size: 11px; letter-spacing: 0.08em; padding: 8px 16px; border: 1px solid rgba(74,122,90,0.2); }
+
+  /* BOLETO BLOCK */
+  .boleto-block {
+    background: var(--white);
+    border: 1px solid var(--sand);
+    padding: 28px;
+  }
+  .boleto-title { font-family: var(--font-serif); font-size: 22px; margin-bottom: 8px; }
+  .boleto-desc { font-size: 13px; color: var(--stone); line-height: 1.7; margin-bottom: 16px; }
+  .boleto-warn { font-size: 11px; color: var(--earth); background: rgba(184,149,106,0.1); border: 1px solid rgba(184,149,106,0.3); padding: 10px 14px; line-height: 1.6; }
+
+  /* COUPON */
+  .coupon-row { display: flex; gap: 12px; margin-top: 20px; }
+  .coupon-row input { flex: 1; text-transform: uppercase; }
+  .btn-coupon {
+    background: transparent;
+    border: 1px solid var(--dark);
+    color: var(--dark);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0 20px;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+  }
+  .btn-coupon:hover { background: var(--dark); color: var(--cream); }
+  .coupon-feedback { font-size: 12px; margin-top: 8px; }
+  .coupon-feedback.ok { color: var(--success); }
+  .coupon-feedback.err { color: var(--danger); }
+
+  /* CTA */
+  .btn-pay {
+    width: 100%;
+    background: var(--bark);
+    color: var(--cream);
+    border: none;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 20px;
+    cursor: pointer;
+    transition: background var(--transition);
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .btn-pay:hover { background: var(--dark); }
+  .btn-pay:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-pay .spinner {
+    width: 16px; height: 16px;
+    border: 1.5px solid rgba(232,221,208,0.3);
+    border-top-color: var(--cream);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: none;
+  }
+  .btn-pay.loading .spinner { display: block; }
+  .btn-pay.loading .btn-label { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .terms-note { font-size: 11px; color: var(--stone); text-align: center; margin-top: 16px; line-height: 1.6; }
+  .terms-note a { color: var(--earth); text-decoration: none; }
+
+  /* ORDER SUMMARY */
+  .order-summary {
+    background: var(--white);
+    border: 1px solid var(--sand);
+    padding: 32px;
+    position: sticky;
+    top: 80px;
+  }
+  .summary-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--sand);
+  }
+  .summary-item {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 12px;
+    align-items: start;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(232,221,208,0.5);
+  }
+  .summary-item:last-of-type { border-bottom: none; }
+  .summary-img {
+    width: 56px; height: 72px;
+    object-fit: cover;
+    display: block;
+  }
+  .summary-img-placeholder {
+    width: 56px; height: 72px;
+    background: var(--sand);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: var(--stone); text-align: center;
+  }
+  .item-name { font-family: var(--font-serif); font-size: 15px; margin-bottom: 2px; }
+  .item-variant { font-size: 11px; color: var(--stone); }
+  .item-qty { font-size: 11px; color: var(--stone); margin-top: 4px; }
+  .item-price { font-size: 14px; color: var(--dark); white-space: nowrap; }
+
+  .summary-divider { border: none; border-top: 1px solid var(--sand); margin: 16px 0; }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--stone);
+    margin-bottom: 10px;
+  }
+  .summary-row.total {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    color: var(--dark);
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+  .summary-row .discount { color: var(--success); }
+
+  /* SUCCESS STATE */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 80px 40px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .success-screen.show { display: block; }
+  .success-icon { font-size: 48px; margin-bottom: 24px; color: var(--success); }
+  .success-title { font-family: var(--font-serif); font-size: 40px; font-weight: 300; margin-bottom: 16px; line-height: 1.2; }
+  .success-title em { font-style: italic; color: var(--earth); }
+  .success-desc { font-size: 14px; color: var(--stone); line-height: 1.8; margin-bottom: 32px; }
+  .success-order { background: var(--white); border: 1px solid var(--sand); padding: 20px 28px; display: inline-block; margin-bottom: 32px; }
+  .success-order small { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--stone); display: block; margin-bottom: 4px; }
+  .success-order strong { font-family: var(--font-serif); font-size: 22px; }
+
+  /* PIX WAITING */
+  .pix-waiting { display: none; text-align: center; padding: 32px; background: var(--white); border: 1px solid var(--sand); }
+  .pix-waiting.show { display: block; }
+  .pix-qr { width: 200px; height: 200px; background: var(--sand); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--stone); }
+  .pix-copy-btn {
+    background: var(--bark); color: var(--cream); border: none;
+    font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 12px 24px; cursor: pointer;
+    transition: background var(--transition);
+  }
+  .pix-copy-btn:hover { background: var(--dark); }
+  .pix-timer { font-size: 12px; color: var(--stone); margin-top: 12px; }
+  .pix-timer span { color: var(--earth); font-weight: 400; }
+
+  @media (max-width: 860px) {
+    .checkout-layout { grid-template-columns: 1fr; padding: 32px 5vw 60px; }
+    .form-side { padding-right: 0; margin-bottom: 40px; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-row.triple { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-link">
+    <svg width="16" height="8" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 16 8"><path d="M16 4H2M6 7.5L2 4 6 .5"/></svg>
+    Voltar à loja
+  </a>
+  <a href="index.html" class="logo"><em>Aura</em> Pijamas</a>
+  <span class="secure-badge">
+    <svg width="12" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Pagamento seguro
+  </span>
+</header>
+
+<!-- SUCCESS SCREEN -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✦</div>
+  <h1 class="success-title">Pedido<br><em>confirmado</em></h1>
+  <p class="success-desc">Seu pedido foi recebido com sucesso. Você receberá um e-mail de confirmação em breve com todos os detalhes e código de rastreio.</p>
+  <div class="success-order">
+    <small>Número do pedido</small>
+    <strong id="successOrderId">#00000</strong>
+  </div>
+  <br>
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--dark);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--dark);">
+    Continuar comprando
+    <svg width="20" height="8" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 20 8"><path d="M0 4h18m-4-3.5L18 4l-4 3.5"/></svg>
+  </a>
+</div>
+
+<!-- CHECKOUT LAYOUT -->
+<div class="checkout-layout" id="checkoutLayout">
+
+  <div class="form-side">
+
+    <!-- STEP 1: CONTACT -->
+    <div class="form-section">
+      <h2 class="step-title"><span class="step-num">1</span> Identificação</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome completo</label>
+          <input type="text" id="fullName" placeholder="Maria Fernanda Silva" autocomplete="name">
+          <span class="field-error" id="err-fullName">Informe seu nome completo</span>
+        </div>
+        <div class="form-group">
+          <label>CPF</label>
+          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCpf(this)">
+          <span class="field-error" id="err-cpf">CPF inválido</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="email" placeholder="maria@email.com" autocomplete="email">
+          <span class="field-error" id="err-email">E-mail inválido</span>
+        </div>
+        <div class="form-group">
+          <label>Celular / WhatsApp</label>
+          <input type="text" id="phone" placeholder="(11) 99999-0000" maxlength="15" oninput="maskPhone(this)">
+          <span class="field-error" id="err-phone">Telefone inválido</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: ADDRESS -->
+    <div class="form-section">
+      <h2 class="step-title"><span class="step-num">2</span> Endereço de entrega</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>CEP</label>
+          <input type="text" id="cep" placeholder="00000-000" maxlength="9" oninput="maskCep(this)" onblur="fetchCep(this.value)">
+          <span class="field-error" id="err-cep">CEP inválido</span>
+        </div>
+        <div class="form-group" style="align-self:end;">
+          <span style="font-size:11px;color:var(--stone);">Busca automática ao sair do campo</span>
+        </div>
+      </div>
+      <div class="form-row triple">
+        <div class="form-group">
+          <label>Rua / Avenida</label>
+          <input type="text" id="street" placeholder="Rua das Flores" autocomplete="street-address">
+        </div>
+        <div class="form-group">
+          <label>Número</label>
+          <input type="text" id="streetNumber" placeholder="123">
+        </div>
+        <div class="form-group">
+          <label>Complemento</label>
+          <input type="text" id="complement" placeholder="Apto 42">
+        </div>
+      </div>
+      <div class="form-row triple">
+        <div class="form-group">
+          <label>Bairro</label>
+          <input type="text" id="neighborhood" placeholder="Jardins">
+        </div>
+        <div class="form-group">
+          <label>Cidade</label>
+          <input type="text" id="city" placeholder="São Paulo">
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="state">
+            <option value="">UF</option>
+            <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+            <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+            <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+            <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+            <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+            <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+            <option selected>SP</option><option>SE</option><option>TO</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: PAYMENT -->
+    <div class="form-section">
+      <h2 class="step-title"><span class="step-num">3</span> Pagamento</h2>
+
+      <div class="payment-tabs">
+        <button class="payment-tab active" onclick="setPaymentMethod('card', this)">
+          <span class="tab-icon">◻</span>
+          Cartão
+        </button>
+        <button class="payment-tab" onclick="setPaymentMethod('pix', this)">
+          <span class="tab-icon">◈</span>
+          Pix
+        </button>
+        <button class="payment-tab" onclick="setPaymentMethod('boleto', this)">
+          <span class="tab-icon">◧</span>
+          Boleto
+        </button>
+      </div>
+
+      <!-- CARD -->
+      <div class="card-fields active" id="cardFields">
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Número do cartão</label>
+            <div class="card-number-wrap">
+              <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" oninput="maskCard(this)" autocomplete="cc-number">
+              <span class="card-brand" id="cardBrand"></span>
+            </div>
+            <span class="field-error" id="err-cardNumber">Número inválido</span>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Nome no cartão</label>
+            <input type="text" id="cardName" placeholder="MARIA F SILVA" style="text-transform:uppercase" autocomplete="cc-name">
+            <span class="field-error" id="err-cardName">Informe o nome como no cartão</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Validade</label>
+            <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" oninput="maskExpiry(this)" autocomplete="cc-exp">
+            <span class="field-error" id="err-cardExpiry">Data inválida</span>
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="text" id="cardCvv" placeholder="000" maxlength="4" autocomplete="cc-csc">
+            <span class="field-error" id="err-cardCvv">CVV inválido</span>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Parcelas</label>
+            <select id="installments" onchange="updateInstallmentInfo()">
+              <option value="1">1x sem juros</option>
+            </select>
+            <div class="installments-info" id="installmentInfo"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PIX -->
+      <div class="pix-fields" id="pixFields">
+        <div class="pix-block">
+          <div class="pix-icon">◈</div>
+          <div class="pix-title">Pague com Pix</div>
+          <p class="pix-desc">Após confirmar o pedido, você receberá o QR Code e o código Pix para pagamento. O pedido é confirmado em segundos.</p>
+          <span class="pix-benefit">✦ &nbsp;Aprovação instantânea</span>
+        </div>
+      </div>
+
+      <!-- BOLETO -->
+      <div class="boleto-fields" id="boletoFields">
+        <div class="boleto-block">
+          <div class="boleto-title">Boleto bancário</div>
+          <p class="boleto-desc">O boleto será gerado após a confirmação e enviado para o seu e-mail. Prazo de compensação: até 3 dias úteis.</p>
+          <div class="boleto-warn">⚠ &nbsp;Seu pedido só será separado após a compensação do boleto. Para entrega mais rápida, prefira Pix ou cartão.</div>
+        </div>
+      </div>
+
+      <!-- COUPON -->
+      <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--sand);">
+        <p style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stone);margin-bottom:12px;">Cupom de desconto</p>
+        <div class="coupon-row">
+          <input type="text" id="couponCode" placeholder="Código do cupom" style="text-transform:uppercase">
+          <button class="btn-coupon" onclick="applyCoupon()">Aplicar</button>
+        </div>
+        <div class="coupon-feedback" id="couponFeedback"></div>
+      </div>
+
+      <!-- SUBMIT -->
+      <button class="btn-pay" id="btnPay" onclick="submitPayment()">
+        <div class="spinner"></div>
+        <span class="btn-label" id="btnPayLabel">Confirmar pedido</span>
+      </button>
+
+      <p class="terms-note">
+        Ao confirmar, você concorda com nossos <a href="#">Termos de uso</a> e <a href="#">Política de privacidade</a>.<br>
+        Pagamento processado com segurança via <strong>Pagar.me</strong>.
+      </p>
+
+      <!-- PIX WAITING (shown after order) -->
+      <div class="pix-waiting" id="pixWaiting">
+        <p style="font-family:var(--font-serif);font-size:22px;margin-bottom:20px;">Escaneie o QR Code</p>
+        <div class="pix-qr" id="pixQrCode">QR Code aqui</div>
+        <p style="font-size:12px;color:var(--stone);margin-bottom:16px;">Ou copie o código abaixo:</p>
+        <input type="text" id="pixCopyKey" readonly style="font-size:11px;text-align:center;background:var(--cream);cursor:pointer;" onclick="this.select()">
+        <br><br>
+        <button class="pix-copy-btn" onclick="copyPixKey()">Copiar código Pix</button>
+        <p class="pix-timer">Expira em <span id="pixCountdown">30:00</span></p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ORDER SUMMARY -->
+  <div class="order-summary">
+    <div class="summary-title">Resumo do pedido</div>
+    <div id="summaryItems"></div>
+    <hr class="summary-divider">
+    <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal">R$ 0,00</span></div>
+    <div class="summary-row"><span>Frete</span><span id="summaryShipping">Calculando...</span></div>
+    <div class="summary-row discount" id="summaryDiscountRow" style="display:none"><span>Desconto</span><span id="summaryDiscount">— R$ 0,00</span></div>
+    <hr class="summary-divider">
+    <div class="summary-row total"><span>Total</span><span id="summaryTotal">R$ 0,00</span></div>
+    <div id="summaryInstallment" style="font-size:12px;color:var(--stone);text-align:right;margin-top:6px;"></div>
+  </div>
+
+</div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+// SUBSTITUA pela sua chave pública do Pagar.me quando criar a conta:
+// Acesse: dashboard.pagar.me → Configurações → API Keys → Chave pública
+const PAGARME_PUBLIC_KEY = 'SUA_CHAVE_PUBLICA_AQUI'; // pk_test_XXXXXXXXXXXXXXXX
+
+// URL do seu backend (Vercel function) — configure após o deploy
+const API_URL = 'https://seu-projeto.vercel.app/api/checkout';
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let cart = JSON.parse(localStorage.getItem('aura_cart') || '[]');
+let coupons = JSON.parse(localStorage.getItem('aura_coupons') || '[]');
+let appliedCoupon = null;
+let paymentMethod = 'card';
+let pixCountdownInterval = null;
+
+const SHIPPING_FREE_THRESHOLD = 250;
+const SHIPPING_COST = 25;
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  if (cart.length === 0) {
+    document.getElementById('checkoutLayout').innerHTML = '<div style="text-align:center;padding:80px 20px;grid-column:1/-1;"><p style="font-family:var(--font-serif);font-size:28px;margin-bottom:20px;">Seu carrinho está vazio</p><a href="index.html" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--dark);text-decoration:none;border-bottom:1px solid var(--dark);padding-bottom:4px;">Voltar à loja</a></div>';
+    return;
+  }
+  renderSummary();
+  buildInstallments();
+}
+
+// ─── SUMMARY ──────────────────────────────────────────────────────────────────
+function renderSummary() {
+  const items = document.getElementById('summaryItems');
+  items.innerHTML = cart.map(item => `
+    <div class="summary-item">
+      <div class="summary-img-placeholder">${item.name.split(' ')[0]}</div>
+      <div>
+        <div class="item-name">${item.name}</div>
+        <div class="item-variant">${item.category} · Tam. ${item.size}</div>
+        <div class="item-qty">Qtd: ${item.qty}</div>
+      </div>
+      <div class="item-price">R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}</div>
+    </div>
+  `).join('');
+  updateTotals();
+}
+
+function updateTotals() {
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const shipping = subtotal >= SHIPPING_FREE_THRESHOLD ? 0 : SHIPPING_COST;
+  const discount = appliedCoupon ? calcDiscount(appliedCoupon, subtotal) : 0;
+  const total = Math.max(0, subtotal + shipping - discount);
+
+  document.getElementById('summarySubtotal').textContent = fmt(subtotal);
+  document.getElementById('summaryShipping').textContent = shipping === 0 ? 'Grátis ✦' : fmt(shipping);
+  document.getElementById('summaryTotal').textContent = fmt(total);
+
+  const discRow = document.getElementById('summaryDiscountRow');
+  if (discount > 0) {
+    discRow.style.display = 'flex';
+    document.getElementById('summaryDiscount').textContent = '— ' + fmt(discount);
+  } else {
+    discRow.style.display = 'none';
+  }
+
+  updateInstallmentInfo();
+}
+
+function calcDiscount(coupon, subtotal) {
+  if (coupon.type === 'percent') return subtotal * (coupon.value / 100);
+  return Math.min(coupon.value, subtotal);
+}
+
+function fmt(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
+
+function getTotal() {
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const shipping = subtotal >= SHIPPING_FREE_THRESHOLD ? 0 : SHIPPING_COST;
+  const discount = appliedCoupon ? calcDiscount(appliedCoupon, subtotal) : 0;
+  return Math.max(0, subtotal + shipping - discount);
+}
+
+// ─── INSTALLMENTS ─────────────────────────────────────────────────────────────
+const INTEREST_RATES = { 1:0, 2:0, 3:0, 4:0.0199, 5:0.0199, 6:0.0199, 7:0.0299, 8:0.0299, 9:0.0299, 10:0.0399, 11:0.0399, 12:0.0399 };
+
+function buildInstallments() {
+  const total = getTotal();
+  const sel = document.getElementById('installments');
+  sel.innerHTML = '';
+  for (let i = 1; i <= 12; i++) {
+    const rate = INTEREST_RATES[i] || 0;
+    const parcela = rate === 0
+      ? total / i
+      : total * (rate * Math.pow(1 + rate, i)) / (Math.pow(1 + rate, i) - 1);
+    if (parcela < 5) continue;
+    const label = i === 1
+      ? `1x de ${fmt(parcela)} sem juros`
+      : rate === 0
+        ? `${i}x de ${fmt(parcela)} sem juros`
+        : `${i}x de ${fmt(parcela)} com juros`;
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  }
+  updateInstallmentInfo();
+}
+
+function updateInstallmentInfo() {
+  const sel = document.getElementById('installments');
+  const info = document.getElementById('installmentInfo');
+  const summInst = document.getElementById('summaryInstallment');
+  if (!sel || !sel.selectedOptions[0]) return;
+  const txt = sel.selectedOptions[0].textContent;
+  if (paymentMethod === 'card') {
+    info.innerHTML = `<span>${txt}</span>`;
+    summInst.textContent = txt;
+  } else {
+    summInst.textContent = '';
+  }
+}
+
+// ─── PAYMENT METHOD ───────────────────────────────────────────────────────────
+function setPaymentMethod(method, btn) {
+  paymentMethod = method;
+  document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cardFields').classList.toggle('active', method === 'card');
+  document.getElementById('pixFields').classList.toggle('active', method === 'pix');
+  document.getElementById('boletoFields').classList.toggle('active', method === 'boleto');
+  const labels = { card: 'Confirmar e pagar', pix: 'Gerar QR Code Pix', boleto: 'Gerar boleto' };
+  document.getElementById('btnPayLabel').textContent = labels[method];
+  document.getElementById('summaryInstallment').textContent = method === 'card' ? document.getElementById('installments').selectedOptions[0]?.textContent || '' : '';
+}
+
+// ─── COUPON ───────────────────────────────────────────────────────────────────
+function applyCoupon() {
+  const code = document.getElementById('couponCode').value.toUpperCase().trim();
+  const fb = document.getElementById('couponFeedback');
+  const found = coupons.find(c => c.code === code && c.active);
+  if (!found) { fb.className = 'coupon-feedback err'; fb.textContent = 'Cupom inválido ou expirado.'; appliedCoupon = null; updateTotals(); return; }
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  if (found.min > 0 && subtotal < found.min) { fb.className = 'coupon-feedback err'; fb.textContent = `Pedido mínimo de ${fmt(found.min)} para este cupom.`; appliedCoupon = null; updateTotals(); return; }
+  if (found.expiry && new Date(found.expiry) < new Date()) { fb.className = 'coupon-feedback err'; fb.textContent = 'Este cupom está expirado.'; appliedCoupon = null; updateTotals(); return; }
+  appliedCoupon = found;
+  const desc = found.type === 'percent' ? found.value + '% de desconto' : fmt(found.value) + ' de desconto';
+  fb.className = 'coupon-feedback ok';
+  fb.textContent = '✦ Cupom aplicado — ' + desc;
+  buildInstallments();
+  updateTotals();
+}
+
+// ─── MASKS ────────────────────────────────────────────────────────────────────
+function maskCpf(el) { el.value = el.value.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2').slice(0,14); }
+function maskPhone(el) { el.value = el.value.replace(/\D/g,'').replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2').slice(0,15); }
+function maskCep(el) { el.value = el.value.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2').slice(0,9); }
+function maskCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+  const brands = { '4':'Visa', '5':'Mastercard', '3':'Amex', '6':'Elo' };
+  document.getElementById('cardBrand').textContent = brands[v[0]] || '';
+}
+function maskExpiry(el) { el.value = el.value.replace(/\D/g,'').replace(/(\d{2})(\d)/,'$1/$2').slice(0,5); }
+
+// ─── CEP LOOKUP ───────────────────────────────────────────────────────────────
+async function fetchCep(cep) {
+  const clean = cep.replace(/\D/g,'');
+  if (clean.length !== 8) return;
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${clean}/json/`);
+    const data = await res.json();
+    if (data.erro) return;
+    document.getElementById('street').value = data.logradouro || '';
+    document.getElementById('neighborhood').value = data.bairro || '';
+    document.getElementById('city').value = data.localidade || '';
+    document.getElementById('state').value = data.uf || 'SP';
+    document.getElementById('streetNumber').focus();
+  } catch(e) {}
+}
+
+// ─── VALIDATION ───────────────────────────────────────────────────────────────
+function showErr(id, show) {
+  const el = document.getElementById('err-' + id);
+  const inp = document.getElementById(id);
+  if (el) el.classList.toggle('show', show);
+  if (inp) inp.classList.toggle('error', show);
+  return show;
+}
+
+function validate() {
+  let ok = true;
+  const name = document.getElementById('fullName').value.trim();
+  if (!name || name.split(' ').length < 2) ok = !showErr('fullName', true) && ok; else showErr('fullName', false);
+  const cpf = document.getElementById('cpf').value.replace(/\D/g,'');
+  if (cpf.length !== 11) ok = !showErr('cpf', true) && ok; else showErr('cpf', false);
+  const email = document.getElementById('email').value;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ok = !showErr('email', true) && ok; else showErr('email', false);
+  const phone = document.getElementById('phone').value.replace(/\D/g,'');
+  if (phone.length < 10) ok = !showErr('phone', true) && ok; else showErr('phone', false);
+  const cepV = document.getElementById('cep').value.replace(/\D/g,'');
+  if (cepV.length !== 8) ok = !showErr('cep', true) && ok; else showErr('cep', false);
+  if (paymentMethod === 'card') {
+    const cn = document.getElementById('cardNumber').value.replace(/\D/g,'');
+    if (cn.length < 14) ok = !showErr('cardNumber', true) && ok; else showErr('cardNumber', false);
+    const cname = document.getElementById('cardName').value.trim();
+    if (!cname) ok = !showErr('cardName', true) && ok; else showErr('cardName', false);
+    const exp = document.getElementById('cardExpiry').value;
+    if (!/^\d{2}\/\d{2}$/.test(exp)) ok = !showErr('cardExpiry', true) && ok; else showErr('cardExpiry', false);
+    const cvv = document.getElementById('cardCvv').value;
+    if (cvv.length < 3) ok = !showErr('cardCvv', true) && ok; else showErr('cardCvv', false);
+  }
+  return ok;
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────────────────
+async function submitPayment() {
+  if (!validate()) {
+    document.querySelector('.error')?.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  const btn = document.getElementById('btnPay');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    const payload = buildPayload();
+
+    // ── MODO DE TESTE ──────────────────────────────────────────────────────
+    // Quando você tiver a chave do Pagar.me configurada e o backend deployado,
+    // remova este bloco simulado e descomente o fetch() abaixo.
+    if (PAGARME_PUBLIC_KEY === 'SUA_CHAVE_PUBLICA_AQUI') {
+      await sleep(1800);
+      handleSuccess({ id: 'or_' + Math.random().toString(36).slice(2,10).toUpperCase() }, payload);
+      return;
+    }
+    // ── FIM MODO DE TESTE ──────────────────────────────────────────────────
+
+    // ── PRODUÇÃO: tokeniza cartão e envia para o backend ──────────────────
+    // const response = await fetch(API_URL, {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(payload)
+    // });
+    // const result = await response.json();
+    // if (!response.ok) throw new Error(result.message || 'Erro ao processar pagamento');
+    // if (result.payment_method === 'pix') { showPixWaiting(result.pix); return; }
+    // if (result.payment_method === 'boleto') { showBoleto(result.boleto_url); return; }
+    // handleSuccess(result, payload);
+
+  } catch (err) {
+    alert('Erro ao processar: ' + err.message + '\n\nVerifique seus dados e tente novamente.');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function buildPayload() {
+  const [expMonth, expYear] = (document.getElementById('cardExpiry')?.value || '/').split('/');
+  return {
+    payment_method: paymentMethod,
+    amount: Math.round(getTotal() * 100),
+    installments: parseInt(document.getElementById('installments')?.value || 1),
+    customer: {
+      name: document.getElementById('fullName').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      document: document.getElementById('cpf').value.replace(/\D/g,''),
+      phone: document.getElementById('phone').value.replace(/\D/g,''),
+    },
+    billing: {
+      street: document.getElementById('street').value,
+      street_number: document.getElementById('streetNumber').value,
+      complementary: document.getElementById('complement').value,
+      neighborhood: document.getElementById('neighborhood').value,
+      city: document.getElementById('city').value,
+      state: document.getElementById('state').value,
+      zipcode: document.getElementById('cep').value.replace(/\D/g,''),
+    },
+    card: paymentMethod === 'card' ? {
+      number: document.getElementById('cardNumber').value.replace(/\D/g,''),
+      holder_name: document.getElementById('cardName').value.trim(),
+      exp_month: expMonth, exp_year: '20' + expYear,
+      cvv: document.getElementById('cardCvv').value,
+    } : null,
+    items: cart.map(i => ({ id: String(i.id), title: i.name, quantity: i.qty, unit_price: Math.round(i.price * 100) })),
+    coupon: appliedCoupon?.code || null,
+  };
+}
+
+function handleSuccess(order, payload) {
+  cart = [];
+  localStorage.removeItem('aura_cart');
+  const orderId = '#' + (order.id || '').toString().toUpperCase().slice(-8).padStart(6, '0');
+  document.getElementById('successOrderId').textContent = orderId;
+  document.getElementById('checkoutLayout').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showPixWaiting(pix) {
+  document.getElementById('pixWaiting').classList.add('show');
+  document.getElementById('pixCopyKey').value = pix.qr_code || '';
+  document.getElementById('btnPay').style.display = 'none';
+  let seconds = 1800;
+  pixCountdownInterval = setInterval(() => {
+    seconds--;
+    const m = String(Math.floor(seconds/60)).padStart(2,'0');
+    const s = String(seconds%60).padStart(2,'0');
+    document.getElementById('pixCountdown').textContent = m + ':' + s;
+    if (seconds <= 0) { clearInterval(pixCountdownInterval); document.getElementById('pixCountdown').textContent = 'Expirado'; }
+  }, 1000);
+  const btn = document.getElementById('btnPay');
+  btn.disabled = false; btn.classList.remove('loading');
+}
+
+function showBoleto(url) {
+  window.open(url, '_blank');
+  handleSuccess({ id: 'boleto_' + Date.now() }, {});
+}
+
+function copyPixKey() {
+  const input = document.getElementById('pixCopyKey');
+  input.select();
+  document.execCommand('copy');
+  const btn = event.target;
+  btn.textContent = 'Copiado ✦';
+  setTimeout(() => btn.textContent = 'Copiar código Pix', 2000);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+init();
+</script>
+</body>
+</html>
