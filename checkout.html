@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Checkout — Aura Pijamas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
@@ -315,12 +315,88 @@
   .pix-timer { font-size: 12px; color: var(--stone); margin-top: 12px; }
   .pix-timer span { color: var(--earth); font-weight: 400; }
 
+  /* Evita zoom automático do iOS em campos de formulário */
   @media (max-width: 860px) {
-    .checkout-layout { grid-template-columns: 1fr; padding: 32px 5vw 60px; }
+    /* Layout */
+    .checkout-layout { grid-template-columns: 1fr; padding: 28px 5vw 60px; }
     .form-side { padding-right: 0; margin-bottom: 40px; }
     .form-row { grid-template-columns: 1fr; }
     .form-row.triple { grid-template-columns: 1fr; }
+
+    /* Inputs — 16px previne zoom automático no iOS */
+    input, select { font-size: 16px; padding: 14px; }
+
+    /* Order summary sai do sticky em mobile */
+    .order-summary { position: static; }
+
+    /* Header */
+    header { padding: 0 5vw; }
+    .secure-badge { display: none; }
+
+    /* Payment tabs */
+    .payment-tab { padding: 14px 8px; font-size: 10px; gap: 6px; }
+    .tab-icon { font-size: 16px; }
+
+    /* Pix e boleto */
+    .pix-block, .boleto-block { padding: 24px 20px; }
+
+    /* Botão pagar */
+    .btn-pay { padding: 18px; font-size: 11px; }
+
+    /* Tela de sucesso */
+    .success-screen { padding: 48px 20px; }
+    .success-title { font-size: 32px; }
   }
+
+  /* iPhone e smartphones pequenos */
+  @media (max-width: 480px) {
+    /* Header compacto */
+    header { height: 56px; padding: 0 20px; }
+    .logo { font-size: 20px; }
+    .back-link span { display: none; }
+
+    /* Layout */
+    .checkout-layout { padding: 20px 20px 40px; padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+
+    /* Step titles */
+    .step-title { font-size: 22px; }
+
+    /* Inputs */
+    input, select { font-size: 16px; padding: 13px 12px; }
+    label { font-size: 9px; }
+
+    /* Coupon */
+    .coupon-row { flex-direction: column; }
+    .btn-coupon { padding: 14px; }
+
+    /* Resumo do pedido */
+    .order-summary { padding: 24px 16px; }
+    .summary-title { font-size: 17px; }
+
+    /* Botão pagar — gruda no rodapé com safe area */
+    .btn-pay {
+      position: sticky;
+      bottom: 0;
+      bottom: env(safe-area-inset-bottom);
+      margin-top: 20px;
+      border-radius: 0;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    }
+
+    /* Tela de sucesso */
+    .success-screen { padding: 40px 20px; padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+    .success-title { font-size: 28px; }
+    .success-desc { font-size: 13px; }
+
+    /* PIX waiting */
+    .pix-waiting { padding: 24px 16px; }
+    .pix-qr { width: 160px; height: 160px; }
+
+    /* Payment tabs */
+    .payment-tabs { margin-bottom: 20px; }
+    .payment-tab { padding: 12px 6px; }
+  }
+
 </style>
 </head>
 <body>
