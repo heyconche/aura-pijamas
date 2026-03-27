@@ -647,12 +647,8 @@
 
 <script>
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
-// SUBSTITUA pela sua chave pública do Pagar.me quando criar a conta:
-// Acesse: dashboard.pagar.me → Configurações → API Keys → Chave pública
-const PAGARME_PUBLIC_KEY = 'SUA_CHAVE_PUBLICA_AQUI'; // pk_test_XXXXXXXXXXXXXXXX
-
-// URL do seu backend (Vercel function) — configure após o deploy
-const API_URL = 'https://seu-projeto.vercel.app/api/checkout';
+// URL do backend (Vercel Serverless Function)
+const API_URL = 'https://aura-pijamas-silk.vercel.app/api/checkout';
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let cart = JSON.parse(localStorage.getItem('aura_cart') || '[]');
@@ -871,27 +867,17 @@ async function submitPayment() {
   try {
     const payload = buildPayload();
 
-    // ── MODO DE TESTE ──────────────────────────────────────────────────────
-    // Quando você tiver a chave do Pagar.me configurada e o backend deployado,
-    // remova este bloco simulado e descomente o fetch() abaixo.
-    if (PAGARME_PUBLIC_KEY === 'SUA_CHAVE_PUBLICA_AQUI') {
-      await sleep(1800);
-      handleSuccess({ id: 'or_' + Math.random().toString(36).slice(2,10).toUpperCase() }, payload);
-      return;
-    }
-    // ── FIM MODO DE TESTE ──────────────────────────────────────────────────
-
-    // ── PRODUÇÃO: tokeniza cartão e envia para o backend ──────────────────
-    // const response = await fetch(API_URL, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(payload)
-    // });
-    // const result = await response.json();
-    // if (!response.ok) throw new Error(result.message || 'Erro ao processar pagamento');
-    // if (result.payment_method === 'pix') { showPixWaiting(result.pix); return; }
-    // if (result.payment_method === 'boleto') { showBoleto(result.boleto_url); return; }
-    // handleSuccess(result, payload);
+    // ── PRODUÇÃO: envia para o backend (Vercel Serverless Function) ────────
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Erro ao processar pagamento');
+    if (result.payment_method === 'pix') { showPixWaiting(result.pix); return; }
+    if (result.payment_method === 'boleto') { showBoleto(result.boleto_url); return; }
+    handleSuccess(result, payload);
 
   } catch (err) {
     alert('Erro ao processar: ' + err.message + '\n\nVerifique seus dados e tente novamente.');
