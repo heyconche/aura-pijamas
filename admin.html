@@ -179,7 +179,7 @@
 
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <em>Aura</em> Pijamas
+    <img src="assets/logofooter.png" alt="Aura Pijamas" style="height:40px;mix-blend-mode:screen;display:block;margin-bottom:6px;">
     <small>Painel Admin</small>
   </div>
   <nav class="sidebar-nav">
@@ -323,14 +323,23 @@
         </div>
       </div>
       <div id="bannerTab-editorial" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <p style="font-size:13px;color:var(--stone)">3 blocos editoriais na seção abaixo dos produtos.</p>
-          <button class="btn btn-primary btn-sm" onclick="openBannerModal('editorial')">Adicionar imagem</button>
-        </div>
+        <p style="font-size:13px;color:var(--stone);margin-bottom:16px;">3 blocos editoriais na seção abaixo dos produtos. Clique em "Alterar" em cada bloco.</p>
         <div id="editorialList">
-          <div class="banner-item"><div style="width:60px;height:40px;background:linear-gradient(135deg,#E8DDD0,#C4B5A5)"></div><div><div style="font-size:14px">Bloco 1 — Tecidos naturais</div><div style="font-size:11px;color:var(--stone);margin-top:2px">Cor: Areia claro</div></div><div class="banner-actions"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Remover</button></div></div>
-          <div class="banner-item"><div style="width:60px;height:40px;background:linear-gradient(135deg,#4A3728,#1C1410)"></div><div><div style="font-size:14px">Bloco 2 — Edição limitada</div><div style="font-size:11px;color:var(--stone);margin-top:2px">Cor: Bark escuro</div></div><div class="banner-actions"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Remover</button></div></div>
-          <div class="banner-item"><div style="width:60px;height:40px;background:linear-gradient(135deg,#C4B5A5,#8B7355)"></div><div><div style="font-size:14px">Bloco 3 — Bestsellers</div><div style="font-size:11px;color:var(--stone);margin-top:2px">Cor: Stone médio</div></div><div class="banner-actions"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Remover</button></div></div>
+          <div class="banner-item" id="edItem1">
+            <div style="width:60px;height:40px;overflow:hidden;background:linear-gradient(135deg,#E8DDD0,#C4B5A5);flex-shrink:0;" id="edThumb1"></div>
+            <div><div style="font-size:14px">Bloco 1 — Tecidos naturais</div><div style="font-size:11px;color:var(--stone);margin-top:2px" id="edStatus1">Sem imagem</div></div>
+            <div class="banner-actions"><button class="btn btn-outline btn-sm" onclick="openBannerModal('ed1')">Alterar</button><button class="btn btn-danger btn-sm" onclick="removeBanner('ed1')">Remover</button></div>
+          </div>
+          <div class="banner-item" id="edItem2">
+            <div style="width:60px;height:40px;overflow:hidden;background:linear-gradient(135deg,#4A3728,#1C1410);flex-shrink:0;" id="edThumb2"></div>
+            <div><div style="font-size:14px">Bloco 2 — Edição limitada</div><div style="font-size:11px;color:var(--stone);margin-top:2px" id="edStatus2">Sem imagem</div></div>
+            <div class="banner-actions"><button class="btn btn-outline btn-sm" onclick="openBannerModal('ed2')">Alterar</button><button class="btn btn-danger btn-sm" onclick="removeBanner('ed2')">Remover</button></div>
+          </div>
+          <div class="banner-item" id="edItem3">
+            <div style="width:60px;height:40px;overflow:hidden;background:linear-gradient(135deg,#C4B5A5,#8B7355);flex-shrink:0;" id="edThumb3"></div>
+            <div><div style="font-size:14px">Bloco 3 — Bestsellers</div><div style="font-size:11px;color:var(--stone);margin-top:2px" id="edStatus3">Sem imagem</div></div>
+            <div class="banner-actions"><button class="btn btn-outline btn-sm" onclick="openBannerModal('ed3')">Alterar</button><button class="btn btn-danger btn-sm" onclick="removeBanner('ed3')">Remover</button></div>
+          </div>
         </div>
       </div>
       <div id="bannerTab-about" style="display:none">
@@ -674,8 +683,32 @@ function saveBannerImage(){
   localStorage.setItem('aura_banners',JSON.stringify(data));
   if(currentBannerTarget==='hero') document.getElementById('heroPreview').innerHTML=`<img src="${bannerImageData}" style="width:100%;height:240px;object-fit:cover">`;
   if(currentBannerTarget==='about') document.getElementById('aboutPreview').innerHTML=`<img src="${bannerImageData}" style="width:100%;height:300px;max-width:400px;object-fit:cover">`;
+  if(['ed1','ed2','ed3'].includes(currentBannerTarget)) updateEditorialThumb(currentBannerTarget, bannerImageData);
   document.getElementById('bannerModal').classList.remove('open');
-  toast('Imagem salva ✦');
+  toast('Imagem salva ✦ — já reflete na loja');
+}
+
+function removeBanner(target){
+  const data=JSON.parse(localStorage.getItem('aura_banners')||'{}');
+  delete data[target];
+  localStorage.setItem('aura_banners',JSON.stringify(data));
+  if(['ed1','ed2','ed3'].includes(target)) updateEditorialThumb(target, null);
+  toast('Imagem removida.');
+}
+
+function updateEditorialThumb(target, src){
+  const n = target.replace('ed','');
+  const thumb = document.getElementById('edThumb'+n);
+  const status = document.getElementById('edStatus'+n);
+  if(src){
+    thumb.innerHTML=`<img src="${src}" style="width:100%;height:100%;object-fit:cover">`;
+    status.textContent='Imagem definida ✦';
+    status.style.color='var(--success)';
+  } else {
+    thumb.innerHTML='';
+    status.textContent='Sem imagem';
+    status.style.color='var(--stone)';
+  }
 }
 
 function saveHeroSettings(){
@@ -688,6 +721,7 @@ function toast(msg){const t=document.getElementById('adminToast');t.textContent=
 const savedBanners=JSON.parse(localStorage.getItem('aura_banners')||'{}');
 if(savedBanners.hero) document.getElementById('heroPreview').innerHTML=`<img src="${savedBanners.hero}" style="width:100%;height:240px;object-fit:cover">`;
 if(savedBanners.about) document.getElementById('aboutPreview').innerHTML=`<img src="${savedBanners.about}" style="width:100%;height:300px;max-width:400px;object-fit:cover">`;
+['ed1','ed2','ed3'].forEach(k=>{ if(savedBanners[k]) updateEditorialThumb(k, savedBanners[k]); });
 document.getElementById('stat-products').textContent=products.filter(p=>p.active!==false).length;
 document.getElementById('stat-coupons').textContent=coupons.filter(c=>c.active).length;
 </script>

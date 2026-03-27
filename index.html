@@ -1297,6 +1297,42 @@ document.getElementById('btnAddToCart').addEventListener('click', addToCart);
 
 renderProducts();
 updateCartUI();
+
+// Aplica configurações salvas pelo admin (localStorage)
+(function applyAdminSettings() {
+  // Banners
+  const banners = JSON.parse(localStorage.getItem('aura_banners') || '{}');
+  const heroImg = document.querySelector('.hero-img');
+  if (banners.hero && heroImg) {
+    heroImg.src = banners.hero;
+    heroImg.style.display = 'block';
+    const placeholder = document.querySelector('.hero-img-placeholder');
+    if (placeholder) placeholder.style.display = 'none';
+  }
+  if (banners.about) {
+    const aboutImg = document.querySelector('.about-img');
+    if (aboutImg) {
+      aboutImg.src = banners.about;
+      aboutImg.style.display = 'block';
+      const inner = document.querySelector('.about-image-inner');
+      if (inner) inner.style.display = 'none';
+    }
+  }
+  const edImgs = document.querySelectorAll('.ed-img');
+  ['ed1','ed2','ed3'].forEach((key, i) => {
+    if (banners[key] && edImgs[i]) edImgs[i].src = banners[key];
+  });
+
+  // Textos do hero
+  const hero = JSON.parse(localStorage.getItem('aura_hero') || '{}');
+  if (hero.title) document.querySelector('.hero-title').innerHTML = hero.title;
+  if (hero.tag)   document.querySelector('.hero-tag').textContent = hero.tag;
+  if (hero.desc)  document.querySelector('.hero-desc').textContent = hero.desc;
+  if (hero.cta) {
+    const ctaLink = document.querySelector('.hero-cta');
+    if (ctaLink) ctaLink.firstChild.textContent = hero.cta + ' ';
+  }
+})();
 </script>
 </body>
 </html>
