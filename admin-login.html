@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Aura Pijamas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F3EE;
+    --sand: #E8DDD0;
+    --stone: #C4B5A5;
+    --earth: #8B7355;
+    --bark: #4A3728;
+    --dark: #1C1410;
+    --white: #FDFAF7;
+    --accent: #B8956A;
+    --danger: #9B4A4A;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Jost', sans-serif;
+    --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bark);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    font-weight: 300;
+  }
+  .login-wrap {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+  }
+  .login-box {
+    background: var(--cream);
+    border-radius: 2px;
+    padding: 48px 40px 40px;
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .login-logo img {
+    height: 44px;
+    mix-blend-mode: multiply;
+  }
+  .login-subtitle {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 40px;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--earth);
+    margin-bottom: 8px;
+  }
+  input {
+    width: 100%;
+    border: 1px solid var(--sand);
+    background: var(--white);
+    padding: 12px 16px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--dark);
+    outline: none;
+    transition: border-color var(--transition);
+    border-radius: 1px;
+  }
+  input:focus { border-color: var(--earth); }
+  .btn-login {
+    width: 100%;
+    background: var(--bark);
+    color: var(--cream);
+    border: none;
+    padding: 14px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background var(--transition);
+    margin-top: 8px;
+    border-radius: 1px;
+  }
+  .btn-login:hover { background: var(--dark); }
+  .error-msg {
+    display: none;
+    color: var(--danger);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+  }
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 24px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(232,221,208,0.5);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--sand); }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="assets/logo.png" alt="Aura Pijamas">
+    </div>
+    <p class="login-subtitle">Painel Administrativo</p>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" placeholder="admin" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-login">Entrar</button>
+      <p class="error-msg" id="errorMsg">Usuário ou senha incorretos.</p>
+    </form>
+  </div>
+  <a href="index.html" class="back-link">← Voltar para a loja</a>
+</div>
+
+<script>
+  // Se já estiver logado, redireciona direto
+  if (sessionStorage.getItem('aura_admin')) {
+    location.href = 'admin.html';
+  }
+
+  // Credenciais — TROQUE antes de publicar em produção!
+  const ADMIN_USER = 'admin';
+  const ADMIN_PASS = 'aura2025';
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const user = document.getElementById('usuario').value.trim();
+    const pass = document.getElementById('senha').value;
+    const err  = document.getElementById('errorMsg');
+
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+      sessionStorage.setItem('aura_admin', '1');
+      location.href = 'admin.html';
+    } else {
+      err.style.display = 'block';
+      document.getElementById('senha').value = '';
+      document.getElementById('senha').focus();
+    }
+  });
+</script>
+</body>
+</html>
