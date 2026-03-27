@@ -106,9 +106,16 @@
     position: relative;
     overflow: hidden;
   }
-  .hero-img-placeholder {
+  /* Imagem do hero — object-fit: cover garante que 1 arquivo funciona em todos os tamanhos */
+  .hero-img {
     width: 100%; height: 100%;
     object-fit: cover;
+    object-position: center top; /* mantém topo (rosto/produto) sempre visível */
+    display: block;
+  }
+  /* Placeholder enquanto não há imagem real — remova quando subir a foto */
+  .hero-img-placeholder {
+    width: 100%; height: 100%;
     display: block;
     background: linear-gradient(160deg, #E8DDD0 0%, #D4C5B2 40%, #C4B5A5 100%);
     position: relative;
@@ -317,11 +324,20 @@
   }
   .editorial-col:nth-child(2) { background: var(--bark); }
   .editorial-col:nth-child(3) { background: var(--stone); }
+  /* Imagem do editorial — mesmo padrão: 1 arquivo, funciona em tudo */
+  .ed-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
   .ed-placeholder {
     width: 100%; height: 100%;
     display: flex;
     align-items: flex-end;
     padding: 32px;
+    position: relative; /* garante z-index sobre a imagem */
   }
   .ed-content { position: relative; z-index: 2; }
   .ed-tag {
@@ -391,6 +407,13 @@
     aspect-ratio: 4/5;
     position: relative;
     overflow: hidden;
+  }
+  /* Imagem about — mesma lógica */
+  .about-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
   }
   .about-image-inner {
     width: 100%; height: 100%;
@@ -750,7 +773,8 @@
 
     /* Hero */
     .hero { grid-template-columns: 1fr; height: auto; }
-    .hero-image { height: 52vw; min-height: 240px; }
+    /* aspect-ratio proporcional: mesma imagem, corte bonito em qualquer tela */
+    .hero-image { aspect-ratio: 4/5; width: 100%; height: auto; }
     .hero-label { display: none; }
     .hero-content { padding: 48px 6vw 52px; }
     .hero-scroll { display: none; }
@@ -760,13 +784,13 @@
     /* Em touch, ações ficam sempre visíveis (sem hover) */
     .product-actions { opacity: 1; transform: translateY(0); }
 
-    /* Editorial */
+    /* Editorial — aspect-ratio no lugar de altura fixa */
     .editorial { grid-template-columns: 1fr; height: auto; margin: 0 4vw; }
-    .editorial-col { height: 260px; }
+    .editorial-col { aspect-ratio: 3/2; height: auto; }
 
     /* Seção About */
     .about-strip { grid-template-columns: 1fr; gap: 40px; padding: 64px 6vw; }
-    .about-image { aspect-ratio: 4/3; width: 100%; }
+    .about-image { aspect-ratio: 4/5; width: 100%; }
 
     /* Features */
     .features { grid-template-columns: repeat(2, 1fr); }
@@ -906,7 +930,10 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-image">
-    <div class="hero-img-placeholder"></div>
+    <!-- BANNER HERO: troque o src pela sua foto (formato 3:4 ou 4:5 recomendado) -->
+    <img src="assets/banner-hero.jpg" class="hero-img" alt="Coleção Aura"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="hero-img-placeholder" style="display:none"></div>
     <span class="hero-label">Nova Coleção 2025</span>
   </div>
   <div class="hero-content">
@@ -936,6 +963,9 @@
 <!-- EDITORIAL -->
 <section class="editorial">
   <div class="editorial-col">
+    <!-- BANNER EDITORIAL 1: troque o src pela sua foto -->
+    <img src="assets/banner-ed1.jpg" class="ed-img" alt="Tecidos naturais"
+         onerror="this.style.display='none'">
     <div class="ed-placeholder">
       <div class="ed-content">
         <span class="ed-tag">Tecidos naturais</span>
@@ -945,6 +975,9 @@
     </div>
   </div>
   <div class="editorial-col">
+    <!-- BANNER EDITORIAL 2: troque o src pela sua foto -->
+    <img src="assets/banner-ed2.jpg" class="ed-img" alt="Pijama Americano"
+         onerror="this.style.display='none'">
     <div class="ed-placeholder">
       <div class="ed-content">
         <span class="ed-tag">Edição limitada</span>
@@ -954,6 +987,9 @@
     </div>
   </div>
   <div class="editorial-col">
+    <!-- BANNER EDITORIAL 3: troque o src pela sua foto -->
+    <img src="assets/banner-ed3.jpg" class="ed-img" alt="Bestsellers"
+         onerror="this.style.display='none'">
     <div class="ed-placeholder">
       <div class="ed-content">
         <span class="ed-tag">Bestsellers</span>
@@ -976,7 +1012,10 @@
     </a>
   </div>
   <div class="about-image">
-    <div class="about-image-inner"><em>foto editorial aqui</em></div>
+    <!-- BANNER SOBRE: troque o src pela sua foto (formato 4:5 recomendado) -->
+    <img src="assets/banner-sobre.jpg" class="about-img" alt="Sobre a Aura"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="about-image-inner" style="display:none"><em>foto editorial aqui</em></div>
   </div>
 </section>
 
