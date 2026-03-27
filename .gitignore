@@ -32,3 +32,6 @@ logs/
 
 .vercel
 .env*.local
+
+# Claude Code
+.claude/
