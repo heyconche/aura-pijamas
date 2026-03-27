@@ -772,22 +772,29 @@
     nav.left { display: none; }
     header { padding: 0 5vw; height: 64px; }
 
-    /* Hero */
-    .hero { grid-template-columns: 1fr; height: auto; }
-    /* aspect-ratio define a altura proporcionalmente — sem height: auto que conflita */
-    .hero-image { aspect-ratio: 4/5; width: 100%; }
+    /* Hero — troca grid por block para o aspect-ratio funcionar corretamente */
+    .hero { display: block; height: auto; }
+    .hero-image {
+      width: 100%;
+      height: 0;
+      padding-bottom: 120%; /* padding-bottom % = relativo à largura = ratio confiável em qualquer contexto */
+      position: relative;
+    }
     .hero-label { display: none; }
     .hero-content { padding: 48px 6vw 52px; }
     .hero-scroll { display: none; }
 
     /* Produtos */
     .products-grid { grid-template-columns: repeat(2, 1fr); }
-    /* Em touch, ações ficam sempre visíveis (sem hover) */
     .product-actions { opacity: 1; transform: translateY(0); }
 
-    /* Editorial — aspect-ratio no lugar de altura fixa */
+    /* Editorial */
     .editorial { grid-template-columns: 1fr; height: auto; margin: 0 4vw; }
-    .editorial-col { aspect-ratio: 3/2; }
+    .editorial-col {
+      height: 0;
+      padding-bottom: 66%; /* 3:2 ratio, mesmo método confiável */
+      position: relative;
+    }
 
     /* Seção About */
     .about-strip { grid-template-columns: 1fr; gap: 40px; padding: 64px 6vw; }
