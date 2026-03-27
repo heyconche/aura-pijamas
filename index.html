@@ -106,19 +106,19 @@
     position: relative;
     overflow: hidden;
   }
-  /* Imagem do hero — object-fit: cover garante que 1 arquivo funciona em todos os tamanhos */
+  /* Imagem do hero — position absolute garante preenchimento correto em qualquer tamanho de container */
   .hero-img {
+    position: absolute; inset: 0;
     width: 100%; height: 100%;
     object-fit: cover;
-    object-position: center top; /* mantém topo (rosto/produto) sempre visível */
+    object-position: center top;
     display: block;
   }
-  /* Placeholder enquanto não há imagem real — remova quando subir a foto */
+  /* Placeholder enquanto não há imagem real */
   .hero-img-placeholder {
-    width: 100%; height: 100%;
+    position: absolute; inset: 0;
     display: block;
     background: linear-gradient(160deg, #E8DDD0 0%, #D4C5B2 40%, #C4B5A5 100%);
-    position: relative;
   }
   .hero-img-placeholder::after {
     content: '';
@@ -408,8 +408,9 @@
     position: relative;
     overflow: hidden;
   }
-  /* Imagem about — mesma lógica */
+  /* Imagem about */
   .about-img {
+    position: absolute; inset: 0;
     width: 100%; height: 100%;
     object-fit: cover;
     object-position: center top;
@@ -773,8 +774,8 @@
 
     /* Hero */
     .hero { grid-template-columns: 1fr; height: auto; }
-    /* aspect-ratio proporcional: mesma imagem, corte bonito em qualquer tela */
-    .hero-image { aspect-ratio: 4/5; width: 100%; height: auto; }
+    /* aspect-ratio define a altura proporcionalmente — sem height: auto que conflita */
+    .hero-image { aspect-ratio: 4/5; width: 100%; }
     .hero-label { display: none; }
     .hero-content { padding: 48px 6vw 52px; }
     .hero-scroll { display: none; }
@@ -786,7 +787,7 @@
 
     /* Editorial — aspect-ratio no lugar de altura fixa */
     .editorial { grid-template-columns: 1fr; height: auto; margin: 0 4vw; }
-    .editorial-col { aspect-ratio: 3/2; height: auto; }
+    .editorial-col { aspect-ratio: 3/2; }
 
     /* Seção About */
     .about-strip { grid-template-columns: 1fr; gap: 40px; padding: 64px 6vw; }
